@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2026合伙经营推演模拟器</title>
+    <style>
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8f9fa; padding: 20px; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #1a3a5a; font-size: 22px; margin-bottom: 25px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        
+        .section { margin-bottom: 30px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+        .section-header { background: #34495e; color: white; padding: 10px 15px; font-weight: bold; }
+        .section-body { padding: 15px; background: #fff; }
+
+        /* 表格样式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        th { background: #f2f4f6; font-size: 0.9em; }
+        input[type="number"] { width: 85%; padding: 5px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
+
+        .total-row { background: #fff9e6; font-weight: bold; }
+        .highlight-blue { color: #3498db; font-weight: bold; }
+        .highlight-red { color: #e74c3c; font-weight: bold; }
+        .highlight-green { color: #27ae60; font-weight: bold; }
+
+        .btn-calc { display: block; width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 6px; font-size: 18px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-calc:hover { background: #219150; }
+
+        .summary-card { background: #eef2f7; padding: 15px; border-radius: 8px; display: flex; justify-content: space-around; align-items: center; }
+        .summary-item { text-align: center; }
+        .summary-item span { display: block; font-size: 0.85em; color: #666; }
+        .summary-item b { font-size: 1.3em; color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>2026经营收益全周期推演</h1>
+
+    <div class="section">
+        <div class="section-header">第一部分：薪资</div>
+        <div class="section-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>人员</th>
+                        <th>底薪(元/月)</th>
+                        <th>提成比例(%)</th>
+                        <th>销售额(万)</th>
+                        <th>底薪合计(万)</th>
+                        <th>提成合计(万)</th>
+                        <th>个人薪酬总额(万)</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTable">
+                    <tr><td>合伙人A</td><td><input type="number" id="s1_sal" value="6000"></td><td><input type="number" id="s1_rate" value="20"></td><td><input type="number" id="s1_target" value="200"></td><td id="s1_sal_y">0</td><td id="s1_comm_y">0</td><td id="s1_total" class="highlight-blue">0</td></tr>
+                    <tr><td>合伙人B</td><td><input type="number" id="s2_sal" value="6000"></td><td><input type="number" id="s2_rate" value="0"></td><td><input type="number" id="s2_target" value="30"></td><td id="s2_sal_y">0</td><td id="s2_comm_y">0</td><td id="s2_total">0</td></tr>
+                    <tr><td>合伙人C</td><td><input type="number" id="s3_sal" value="6000"></td><td><input type="number" id="s3_rate" value="0"></td><td><input type="number" id="s3_target" value="30"></td><td id="s3_sal_y">0</td><td id="s3_comm_y">0</td><td id="s3_total">0</td></tr>
+                    <tr><td>合伙人D</td><td><input type="number" id="s4_sal" value="6000"></td><td><input type="number" id="s4_rate" value="0"></td><td><input type="number" id="s4_target" value="40"></td><td id="s4_sal_y">0</td><td id="s4_comm_y">0</td><td id="s4_total">0</td></tr>
+                    <tr><td>成员E (员工)</td><td><input type="number" id="s5_sal" value="5000"></td><td><input type="number" id="s5_rate" value="0"></td><td><input type="number" id="s5_target" value="0"></td><td id="s5_sal_y">0</td><td id="s5_comm_y">0</td><td id="s5_total">0</td></tr>
+                    <tr><td>成员F (员工)</td><td><input type="number" id="s6_sal" value="5000"></td><td><input type="number" id="s6_rate" value="0"></td><td><input type="number" id="s6_target" value="0"></td><td id="s6_sal_y">0</td><td id="s6_comm_y">0</td><td id="s6_total">0</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="4">第一部分：薪资汇总(万)</td>
+                        <td id="total_sal_all">0</td>
+                        <td id="total_comm_all">0</td>
+                        <td id="total_staff_all">0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">第二部分：年度办公运营成本</div>
+        <div class="section-body">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                <div class="summary-item"><span>投流/营销费(万)</span><input type="number" id="exp_ads" value="15"></div>
+                <div class="summary-item"><span>办公室租金(万)</span><input type="number" id="exp_rent" value="10"></div>
+                <div class="summary-item"><span>团建/出差费(万)</span><input type="number" id="exp_team" value="5"></div>
+                <div class="summary-item"><span>招待/公关费(万)</span><input type="number" id="exp_host" value="3"></div>
+            </div>
+            <div style="margin-top: 15px; text-align: right; font-weight: bold; color: #e74c3c;">运营成本总额：<span id="total_exp_fixed">0</span> 万</div>
+        </div>
+    </div>
+
+    <button class="btn-calc" onclick="runAll()">同步计算·全盘推演</button>
+
+    <div class="section">
+        <div class="section-header">第三部分：公司损益明细汇总</div>
+        <div class="section-body">
+            <div class="summary-card">
+                <div class="summary-item"><span>年度预估毛利额</span><b id="sum_gross" class="highlight-blue">0 万</b></div>
+                <div class="summary-item"><span>- 薪资汇总</span><b id="sum_staff" class="highlight-red">0 万</b></div>
+                <div class="summary-item"><span>- 运营成本总支出</span><b id="sum_fixed" class="highlight-red">0 万</b></div>
+                <div class="summary-item"><span>= 年度分红净利润</span><b id="sum_net" class="highlight-green">0 万</b></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">第四部分：分红最终测算（4人制）</div>
+        <div class="section-body">
+            <table>
+                <thead>
+                    <tr>
+                        <th>股东</th>
+                        <th>设定股份(%)</th>
+                        <th>预计年度分红(万)</th>
+                        <th>底薪+提成(万)</th>
+                        <th>年度总收入(万)</th>
+                    </tr>
+                </thead>
+                <tbody id="shareTable">
+                    <tr><td>合伙人A</td><td><input type="number" id="share_1" value="15"></td><td id="div_1">0</td><td id="inc_1">0</td><td class="highlight-green" id="final_1">0</td></tr>
+                    <tr><td>合伙人B</td><td><input type="number" id="share_2" value="28.3"></td><td id="div_2">0</td><td id="inc_2">0</td><td id="final_2">0</td></tr>
+                    <tr><td>合伙人C</td><td><input type="number" id="share_3" value="28.3"></td><td id="div_3">0</td><td id="inc_3">0</td><td id="final_3">0</td></tr>
+                    <tr><td>合伙人D</td><td><input type="number" id="share_4" value="28.4"></td><td id="div_4">0</td><td id="inc_4">0</td><td id="final_4">0</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function runAll() {
+        let total_sal_all = 0;
+        let total_comm_all = 0;
+        let total_gross_target = 0;
+
+        // 1. 计算第一部分：6人薪酬
+        for(let i=1; i<=6; i++) {
+            let s_sal = parseFloat(document.getElementById(`s${i}_sal`).value) || 0;
+            let s_rate = parseFloat(document.getElementById(`s${i}_rate`).value) || 0;
+            let s_target = parseFloat(document.getElementById(`s${i}_target`).value) || 0;
+            
+            let sal_y = (s_sal * 12) / 10000;
+            let comm_y = s_target * (s_rate / 100);
+            let s_total = sal_y + comm_y;
+
+            document.getElementById(`s${i}_sal_y`).innerText = sal_y.toFixed(2);
+            document.getElementById(`s${i}_comm_y`).innerText = comm_y.toFixed(2);
+            document.getElementById(`s${i}_total`).innerText = s_total.toFixed(2);
+
+            total_sal_all += sal_y;
+            total_comm_all += comm_y;
+            total_gross_target += s_target;
+
+            // 如果是前4人，同步给分红表中的薪酬项
+            if(i <= 4) {
+                document.getElementById(`inc_${i}`).innerText = s_total.toFixed(2);
+            }
+        }
+        document.getElementById('total_sal_all').innerText = total_sal_all.toFixed(2);
+        document.getElementById('total_comm_all').innerText = total_comm_all.toFixed(2);
+        document.getElementById('total_staff_all').innerText = (total_sal_all + total_comm_all).toFixed(2);
+
+        // 2. 计算第二部分：运营成本
+        let ads = parseFloat(document.getElementById('exp_ads').value) || 0;
+        let rent = parseFloat(document.getElementById('exp_rent').value) || 0;
+        let team = parseFloat(document.getElementById('exp_team').value) || 0;
+        let host = parseFloat(document.getElementById('exp_host').value) || 0;
+        let total_fixed = ads + rent + team + host;
+        document.getElementById('total_exp_fixed').innerText = total_fixed.toFixed(2);
+
+        // 3. 计算第三部分：损益汇总
+        let netProfit = total_gross_target - (total_sal_all + total_comm_all) - total_fixed;
+        if(netProfit < 0) netProfit = 0;
+
+        document.getElementById('sum_gross').innerText = total_gross_target.toFixed(2) + " 万";
+        document.getElementById('sum_staff').innerText = (total_sal_all + total_comm_all).toFixed(2) + " 万";
+        document.getElementById('sum_fixed').innerText = total_fixed.toFixed(2) + " 万";
+        document.getElementById('sum_net').innerText = netProfit.toFixed(2) + " 万";
+
+        // 4. 计算第四部分：4位股东分红
+        for(let i=1; i<=4; i++) {
+            let share = parseFloat(document.getElementById(`share_${i}`).value) || 0;
+            let div_val = netProfit * (share / 100);
+            let inc_val = parseFloat(document.getElementById(`inc_${i}`).innerText);
+            
+            document.getElementById(`div_${i}`).innerText = div_val.toFixed(2);
+            document.getElementById(`final_${i}`).innerText = (div_val + inc_val).toFixed(2) + " 万";
+        }
+    }
+</script>
+</body>
+</html>
